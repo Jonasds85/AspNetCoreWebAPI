@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SmartSchool.WebAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmartSchool.WebAPI
 {
@@ -25,7 +27,25 @@ namespace SmartSchool.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<Data.AppContext>(
+                options => options.UseSqlite(Configuration.GetConnectionString("Default"))
+            );
             services.AddControllers();
+
+            services.AddSwaggerGen(s =>
+            {
+                s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Example Web Api with Swagger",
+                    Description = "It is only one example who use swagger in dotnet core. :)",
+                    Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                    {
+                        Name = "Júnior Porfirio",
+                        Url = new Uri("https://www.medium.com/@juniorporfirio")
+                    }
+                });
+            });            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,6 +65,14 @@ namespace SmartSchool.WebAPI
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+                        app.UseSwagger();
+
+            app.UseSwaggerUI(s =>
+            {
+                s.RoutePrefix = "swagger";
+                s.SwaggerEndpoint("/swagger/v1/swagger.json", "Api Example");
             });
         }
     }
