@@ -14,73 +14,64 @@ namespace SmartSchool.WebAPI.Controllers
     [Route("api/[controller]")]
     public class AlunoController : ControllerBase
     {
-        public AppContext _Context { get; }
+        public readonly IRepositorio _Repos;
 
-        public AlunoController(AppContext context)
+        public AlunoController(IRepositorio repos)
         {
-            _Context = context;
+            _Repos = repos;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_Context.Alunos.ToList());
+            var result = _Repos.GetAllAlunos(true);
+            return Ok(result);
         }
 
         [HttpGet("{id:int}")]
-        public IActionResult GetById(int id)        
+        public IActionResult GetBy(int id)
         {
-            var aluno = _Context.Alunos.FirstOrDefault(a => a.Id == id);
+            var aluno = _Repos.GetByAlunoId(id);
             if (aluno == null)
                 return BadRequest("Aluno não encontrado");
             else
                 return Ok(aluno);
         }
 
-        [HttpGet("{ByName}")]
-        public IActionResult GetByNome(string nome, string SobreNome)
-        {
-            var aluno = _Context.Alunos.FirstOrDefault(
-                a => a.Nome.Contains(nome) && a.SobreNome.Contains(SobreNome)                
-            );
-
-            if (aluno == null)
-                return BadRequest("Aluno não encontrado");
-            else
-                return Ok(aluno);
-        }
 
         [HttpPost]
         public IActionResult Post(Aluno aluno)
         {
-            _Context.Add(aluno);
-            _Context.SaveChanges();
+            _Repos.Add(aluno);
+            _Repos.SaveChanges();
             return Ok(aluno);
         }
 
         [HttpPatch]
         public IActionResult Patch(int id, Aluno aluno)
-        {            
-            var alunoAux = _Context.Alunos.FirstOrDefault(a => a.Id == id);
-            if(alunoAux == null)
+        {
+            var alunoAux = _Repos.GetByAlunoId(id);
+            if (alunoAux == null)
                 return BadRequest("Aluno não encontrado!");
-            else{
-                _Context.Update(aluno);
-                _Context.SaveChanges();
+            else
+            {
+                _Repos.Update(aluno);
+                _Repos.SaveChanges();
             }
             return Ok(aluno);
-        }        
+        }
 
         [HttpPut("{id}")]
         public IActionResult Put(int id, Aluno aluno)
-        {     
+        {
             //para não travar o objeto e assim permitir o update .AsNoTracking()  
-            var alunoAux = _Context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
-            if(alunoAux == null)
+            var alunoAux = _Repos.GetByAlunoId(id);
+            if (alunoAux == null)
                 return BadRequest("Aluno não encontrado!");
-            else{
-                _Context.Update(aluno);
-                _Context.SaveChanges();
+            else
+            {
+                _Repos.Update(aluno);
+                _Repos.SaveChanges();
             }
 
             return Ok(aluno);
@@ -90,12 +81,13 @@ namespace SmartSchool.WebAPI.Controllers
         public IActionResult Delete(int id)
         {
             //aqui não precisaa isso .AsNoTracking() porque é preciso bloquear o resgistro pra poder excluir
-            var aluno = _Context.Alunos.FirstOrDefault(a => a.Id == id);
-            if(aluno == null)
+            var aluno = _Repos.GetByAlunoId(id);
+            if (aluno == null)
                 return BadRequest("Aluno não encontrado!");
-            else{
-                _Context.Remove(aluno);
-                _Context.SaveChanges();
+            else
+            {
+                _Repos.Delete(aluno);
+                _Repos.SaveChanges();
             }
 
             return Ok("");
