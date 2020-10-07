@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmartSchool.WebAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace SmartSchool.WebAPI
 {
@@ -27,9 +28,11 @@ namespace SmartSchool.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<Data.AppContext>(
+            services.AddDbContext<Data.ProjContext>(
                 options => options.UseSqlite(Configuration.GetConnectionString("Default"))
             );
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddScoped<IRepositorio, Repositorio>();
             
@@ -73,8 +76,7 @@ namespace SmartSchool.WebAPI
                 endpoints.MapControllers();
             });
 
-                        app.UseSwagger();
-
+            app.UseSwagger();
             app.UseSwaggerUI(s =>
             {
                 s.RoutePrefix = "swagger";

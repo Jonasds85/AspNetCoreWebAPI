@@ -6,10 +6,10 @@ namespace SmartSchool.WebAPI.Data
 {
     public class Repositorio : IRepositorio
     {
-        public readonly AppContext _Context;
+        public readonly ProjContext _Context;
 
         //em Startup.ConfigureServices, esta configurado a injeção do tipo Repositorio, no qual tem acesso ao AppContext
-        public Repositorio(AppContext Context)
+        public Repositorio(ProjContext Context)
         {
             _Context = Context;
         }
